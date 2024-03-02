@@ -73,5 +73,32 @@ services:
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
 
+  process-exporter:
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: "32M"
+        reservations:
+          cpus: "0.1"
+          memory: "32M"
+    image: ncabatoff/process-exporter
+    container_name: process-exporter
+    #    network_mode: host
+    privileged: true
+    networks:
+      - default
+        #    ports: 
+    #      - "9256:9256"
+    restart: always
+    volumes:
+      - '/proc:/host/proc:ro'
+      - './process-exporter.yml:/config/process-exporter.yml'
+    command:
+      - '--procfs'
+      - '/host/proc'
+      - '-config.path'
+      - '/config/process-exporter.yml'
+
 volumes:
   prometheus: {}
